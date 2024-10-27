@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="06e7fab9-08bf-4323-b904-a36bdacdb2ed" name="Changes" comment="update README.md">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-    </list>
+    <list default="true" id="06e7fab9-08bf-4323-b904-a36bdacdb2ed" name="Changes" comment="update README.md" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -108,7 +106,7 @@
       <workItem from="1729810240782" duration="10000" />
       <workItem from="1729971755575" duration="1750000" />
       <workItem from="1730020156429" duration="2925000" />
-      <workItem from="1730023618805" duration="23331000" />
+      <workItem from="1730023618805" duration="24032000" />
     </task>
     <task id="LOCAL-00001" summary="commit predict">
       <created>1729801182445</created>
