@@ -5,8 +5,11 @@ import pandas as pd
 import spacy
 from gensim.models import Word2Vec
 from sklearn.feature_extraction.text import CountVectorizer
-from spacy.lang.fr import stop_words
 
+from spacy.lang.fr import stop_words
+import nltk
+from nltk.stem.snowball import FrenchStemmer
+nltk.download('stopwords')
 
 def process_text_lematization(text, nlp):
     stop_words = nlp.Defaults.stop_words
@@ -17,26 +20,23 @@ def process_text_lematization(text, nlp):
             if token.text.lower() not in stop_words and not token.is_punct
         ]
     )
-
+stemmer = FrenchStemmer("french")
 
 def process_text_stemming(text, nlp):
     stop_words = nlp.Defaults.stop_words
     return " ".join(
         [
-            token.lemma_.lower()
+            stemmer.stem(token.text.lower())  # Application du stemming au lieu de la lemmatisation
             for token in nlp(text)
             if token.text.lower() not in stop_words and not token.is_punct
         ]
     )
 
-
 def apply_CountVectorizer(X_train, X_test):
-    vectorizer = CountVectorizer()
-    X_train = vectorizer.fit_transform(X_train)
-    X_test = vectorizer.transform(X_test)
-
-    return X_train, X_test
-
+        vectorizer = CountVectorizer()
+        X_train = vectorizer.fit_transform(X_train).toarray()
+        X_test = vectorizer.transform(X_test).toarray()
+        return X_train, X_test
 
 def apply_word2vec(X_train, X_test):
     model = Word2Vec(
@@ -65,16 +65,18 @@ def make_features(df_input, df_test):
     nlp = spacy.load("fr_core_news_md")
 
     df_input["video_name_lematized"] = df_input["video_name"].apply(
-        lambda x: process_text_lematization(x, nlp)
+        lambda x: process_text_stemming(x, nlp)
     )
+    print(df_input["video_name_lematized"])
     df_test["video_name_lematized"] = df_test["video_name"].apply(
         lambda x: process_text_lematization(x, nlp)
     )
     y_train = df_input["label"]
-    X_train_to_vec, X_test_to_vec = apply_word2vec(
-        df_input["video_name_lematized"], df_test["video_name_lematized"]
-    )
-    # X_train_to_vec, X_test_to_vec = apply_CountVectorizer(df_input["video_name_lematized"], df_test["video_name_lematized"])
+    # X_train_to_vec, X_test_to_vec = apply_word2vec(
+    #     df_input["video_name_lematized"], df_test["video_name_lematized"]
+    # )
+    X_train_to_vec, X_test_to_vec = apply_CountVectorizer(df_input["video_name_lematized"], df_test["video_name_lematized"])
+    print(X_train_to_vec)
     np.save("src/data/raw/X_train.npy", X_train_to_vec)
     np.save("src/data/raw/X_test.npy", X_test_to_vec)
     return X_train_to_vec, y_train
