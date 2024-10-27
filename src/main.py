@@ -135,12 +135,7 @@ def predict(input_filename, model_dump_filename, output_filename):
         df_test = pd.read_csv(input_filename)
 
         print(f"Creating features using {encoder} encoder...")
-        df_test_features, y = make_features(
-            df_test,
-            train=False,
-            save_path=vectorizer_path,
-            vectorizer_type=encoder
-        )
+        df_test_features, y = make_features( df_test, train=False,save_path=vectorizer_path,vectorizer_type=encoder )
 
         print("Making predictions...")
         predictions = model.predict(df_test_features)
@@ -182,7 +177,6 @@ def evaluate(input_filename, encoder: str = "count",model_type: str = "random_fo
     try:
         df_train = make_dataset(input_filename)
         vectorizer_path = DEFAULT_PATHS["vectorizer"][encoder]
-
         X_train, y_train = make_features(df_train,save_path=vectorizer_path,)
         print("evalute : ", model_type )
         model = make_model(model_type)
