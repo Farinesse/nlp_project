@@ -26,7 +26,7 @@ def process_text_stemming(text, nlp):
     stop_words = nlp.Defaults.stop_words
     return " ".join(
         [
-            stemmer.stem(token.text.lower())  # Application du stemming au lieu de la lemmatisation
+            stemmer.stem(token.text.lower())
             for token in nlp(text)
             if token.text.lower() not in stop_words and not token.is_punct
         ]
