@@ -9,7 +9,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from spacy.lang.fr import stop_words
 import nltk
 from nltk.stem.snowball import FrenchStemmer
-nltk.download('stopwords')
+
 
 def process_text_lematization(text, nlp):
     stop_words = nlp.Defaults.stop_words
