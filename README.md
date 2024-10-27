@@ -48,7 +48,7 @@ video_name,is_comic
 
 1. Cloner le repository :
 ```bash
-git clone [URL_DU_REPO]
+git clone https://github.com/Farinesse/nlp_project.git
 cd NLP_project
 ```
 
