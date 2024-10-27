@@ -1,53 +1,149 @@
-# NLP TD 1: classification
+# NLP Video Classification Project
 
-L'objectif de ce TD est de créer un modèle "nom de vidéo" -> "is_comic" (is_comic vaut 1 si c'est une chronique humouristique, 0 sinon).
+Ce projet implémente une pipeline de classification de vidéos basée sur le traitement du langage naturel (NLP). Il permet de classifier des vidéos comme étant comiques ou non en se basant sur leurs titres.
 
-Dans ce TD, on s'intéresse surtout à la démarche. Pour chaque tâche:
-- Bien poser le problème
-- Avoir une baseline
-- Experimenter diverses features et modèles
-- Garder une trace écrite des expérimentations dans un rapport. Dans le rapport, on s'intéresse plus au sens du travail effectué (quelles expérimentations ont été faites, pourquoi, quelles conclusions) qu'à la liste de chiffres.
-- Avoir une codebase clean, permettant de reproduire les expérimentations.
+## Structure du Projet
 
-On se contentera de méthodes pré-réseaux de neurones. Nos features sont explicables et calculables "à la main".
-
-La codebase doit fournir les entry points suivant:
-- Un entry point pour train, prenant en entrée le path aux données de train et dumpant le modèle dans "model_dump" 
 ```
-python src/main.py train --input_filename=data/raw/train.csv --model_dump_filename=models/model.json
-```
-- Un entry point pour predict, prenant en entrée le path au modèle dumpé, le path aux données à prédire et outputtant dans un csv les prédictions
-```
-python src/main.py predict --input_filename=data/raw/test.csv --model_dump_filename=models/model.json --output_filename=data/processed/prediction.csv
-```
-- Un entry point pour evaluer un modèle, prenant en entrée le path aux données de train.
-```
-python src/main.py evaluate --input_filename=data/raw/train.csv
+NLP_project/
+├── data/
+│   ├── processed/       # Données traitées et prédictions
+│   └── raw/            # Données brutes (CSV)
+│       ├── train.csv   # Fichier d'entraînement
+│       └── test.csv    # Fichier de test
+├── models/             # Modèles entraînés et vectorizers
+├── notebook/          # Notebooks Jupyter pour l'exploration
+├── src/               # Code source
+│   ├── data.py        # Fonctions de chargement des données
+│   ├── feature.py     # Fonctions de feature engineering
+│   ├── models.py      # Définitions des modèles
+│   └── main.py        # Point d'entrée principal
+├── .gitignore
+├── README.md
+└── requirements.txt
 ```
 
+## Prérequis
 
-## Dataset
+### Données Requises
 
-Dans [ce lien](https://docs.google.com/spreadsheets/d/1HBs08WE5DLcHEfS6MqTivbyYlRnajfSVnTiKxKVu7Vs/edit?usp=sharing), on a un CSV avec 2 colonnes:
-- video_name: le nom de la video
-- is_comic: est-ce une chronique humoristique
+Avant de commencer, assurez-vous d'avoir les fichiers de données suivants dans le dossier `data/raw/` :
 
-## Partie 1: Text classification: prédire si la vidéo est une chronique comique
+1. **train.csv** : Fichier d'entraînement avec les colonnes :
+   - `video_name` : Titre de la vidéo
+   - `is_comic` : Label (1 pour comique, 0 pour non-comique)
 
-### Tasks
+2. **test.csv** : Fichier de test avec la colonne :
+   - `video_name` : Titre de la vidéo
+   - `is_comic` (optionnel) : Pour l'évaluation
 
-- Créer une pipeline train, qui:
-  - load le CSV
-  - transforme les titres de videos en one-hot-encoded words (avec sklearn: CountVectorizer)
-  - train un modèle (linéaire ou random forest)
-  - dump le model
-- Créer la pipeline predict, qui:
-  - prend le modèle dumpé
-  - prédit sur de nouveaux noms de video
-  <br\>(comment cette partie one-hot encode les mots ? ERREUR à éviter: l'encoding en "predict" ne pointe pas les mots vers les mêmes index. Par exemple, en train, un nom de video avec le mot chronique aurait 1 dans la colonne \#10, mais en predict, il aurait 1 dans la colonne \#23)
-- (optionel mais recommandé: créer une pipeline "evaluate" qui fait la cross-validation du modèle pour connaître ses performances)
-- Transformer les noms de video avec différentes opérations de NLTK (Stemming, remove stop words) ou de CountVectorizer (min / max document frequency)
-- Envoyer ce code (à la fin du cour)
-- Itérer avec les différentes features / différents modèles pour trouver le plus performant
-- Faire un rapport avec les différentes itérations faites, et les conclusions
-- Envoyer le rapport et le code entraînant le meilleur modèle
+Format des fichiers CSV :
+```csv
+video_name,is_comic
+"Titre de la vidéo 1",1
+"Titre de la vidéo 2",0
+```
+
+## Installation
+
+1. Cloner le repository :
+```bash
+git clone [URL_DU_REPO]
+cd NLP_project
+```
+
+2. Créer l'environnement virtuel et l'activer :
+```bash
+python -m venv venv
+
+# Sur Windows :
+venv\Scripts\activate
+# Sur Unix/MacOS :
+source venv/bin/activate
+```
+
+3. Mettre à jour pip :
+```bash
+python -m pip install --upgrade pip
+```
+
+4. Installer les dépendances :
+```bash
+pip install -r requirements.txt
+```
+
+5. Télécharger le modèle spaCy français :
+```bash
+python -m spacy download fr_core_news_md
+```
+
+## Utilisation
+
+### Entraînement d'un Modèle
+
+```bash
+python src/main.py train --encoder [ENCODER] --model_type [MODEL]
+```
+
+Options disponibles :
+- `--encoder` : Type d'encodeur de texte ('word2vec', 'count', 'tfidf')
+- `--model_type` : Type de modèle ('random_forest', 'svc', 'logistic_regression')
+- `--input_filename` : Chemin vers les données d'entraînement
+- `--model_dump_filename` : Chemin pour sauvegarder le modèle
+
+Exemple :
+```bash
+python src/main.py train --encoder word2vec --model_type random_forest
+```
+
+### Faire des Prédictions
+
+```bash
+python src/main.py predict [OPTIONS]
+```
+
+Options :
+- `--input_filename` : Fichier de données de test
+- `--model_dump_filename` : Fichier du modèle entraîné
+- `--output_filename` : Fichier de sortie pour les prédictions
+
+### Évaluation du Modèle
+
+```bash
+python src/main.py evaluate [OPTIONS]
+```
+
+Options :
+- `--encoder` : Type d'encodeur à évaluer
+- `--model_type` : Type de modèle à évaluer
+- `--input_filename` : Données pour l'évaluation
+
+## Encodeurs Disponibles
+
+1. **Count Vectorizer** (`count`)
+   - Vectorisation basée sur la fréquence des mots
+   - Bon pour les textes courts
+
+2. **TF-IDF** (`tfidf`)
+   - Vectorisation tenant compte de l'importance relative des mots
+   - Performant pour les textes de longueur variable
+
+3. **Word2Vec** (`word2vec`)
+   - Embeddings de mots basés sur le contexte
+   - Capture mieux les relations sémantiques
+
+## Modèles Disponibles
+
+1. **Random Forest** (`random_forest`)
+   - Bon équilibre entre performance et interprétabilité
+   - Gère bien les features non linéaires
+
+2. **SVC** (`svc`)
+   - Support Vector Classification
+   - Performant sur les espaces de grande dimension
+
+3. **Logistic Regression** (`logistic_regression`)
+   - Modèle linéaire simple et interprétable
+   - Bon pour les données linéairement séparables
+
+
