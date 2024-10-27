@@ -3,7 +3,7 @@
 
 # Arnaud: do not commit data
 /data/processed/
-*.csv
+
 
 
 ### Python ###
